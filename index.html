@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>MINKU — A Birthday Original ❤️</title>
+  <meta name="description" content="A private Netflix-style birthday original made especially for Minku." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="boot" class="boot-screen" aria-hidden="true">
+    <div class="netflix-n">N</div>
+    <div class="n-streaks"></div>
+  </div>
+
+  <section id="profiles" class="profile-screen" aria-label="Who's watching?">
+    <div class="nf-wordmark">NETFLIX</div>
+    <h1>Who's watching?</h1>
+
+    <div id="profileGrid" class="profile-grid"></div>
+
+    <button id="manageProfiles" class="manage-btn" type="button">MANAGE PROFILE</button>
+  </section>
+
+  <main id="app" class="app hidden">
+    <header class="topbar">
+      <div class="top-logo">NETFLIX</div>
+      <nav>
+        <a href="#home">Home</a>
+        <a href="#episodes">Episodes</a>
+        <a href="#memories">Memories</a>
+        <a href="#letter">Letter</a>
+      </nav>
+      <div class="top-profile">M</div>
+    </header>
+
+    <section id="home" class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <div class="hero-kicker">A BIRTHDAY ORIGINAL • 2026</div>
+        <h2>MINKU ❤️</h2>
+        <h3>A Story Worth Celebrating</h3>
+        <p>One special girl. Beautiful memories. A little world made just to make you smile.</p>
+        <div class="hero-actions">
+          <button id="playStory" class="play-btn">▶ PLAY STORY</button>
+          <a href="#memories" class="info-btn">ⓘ More Info</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="episodes" class="content-section">
+      <div class="section-heading">
+        <span>CONTINUE WATCHING</span>
+        <h2>Minku Originals</h2>
+      </div>
+      <div id="videoRow" class="media-row"></div>
+    </section>
+
+    <section id="memories" class="content-section">
+      <div class="section-heading">
+        <span>MEMORIES</span>
+        <h2>A Story Made of Moments ❤️</h2>
+      </div>
+      <div id="photoRow" class="photo-row"></div>
+    </section>
+
+    <section id="letter" class="letter-section">
+      <div class="letter-card">
+        <div class="letter-kicker">A LETTER FOR MINKU</div>
+        <h2>Happy Birthday, Minku 🎂❤️</h2>
+        <p>
+          Today isn't just another date on the calendar. It's a little reminder
+          that the world became a happier place because you are in it.
+        </p>
+        <p>
+          May this year bring you more reasons to smile, more moments worth
+          remembering, and everything your heart quietly wishes for.
+        </p>
+        <p class="signature">With love, Yuvi ❤️</p>
+      </div>
+    </section>
+
+    <footer>
+      <strong>A YUVI PRODUCTION 🎬</strong>
+      <span>MADE WITH LOVE • CREATED FOR MINKU ❤️</span>
+    </footer>
+  </main>
+
+  <div id="viewer" class="viewer hidden" aria-hidden="true">
+    <button id="viewerClose" class="viewer-close" type="button">×</button>
+    <div id="viewerMedia" class="viewer-media"></div>
+  </div>
+
+  <video id="musicPlayer" class="music-player" playsinline preload="metadata"></video>
+  <button id="musicButton" class="music-button hidden" type="button">🔊 MUSIC</button>
+
+  <div id="status" class="status" aria-live="polite"></div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
