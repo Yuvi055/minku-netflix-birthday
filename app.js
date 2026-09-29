@@ -25,8 +25,9 @@ const supabase =
     }
   );
 
-const $ = (selector) =>
-  document.querySelector(selector);
+const $ =
+  (selector) =>
+    document.querySelector(selector);
 
 const state = {
   objects: [],
@@ -43,20 +44,20 @@ function showStatus(
   message,
   isError = false
 ) {
-  const status =
+  const el =
     $('#status');
 
-  if (!status) return;
+  if (!el) return;
 
-  status.textContent =
+  el.textContent =
     message;
 
-  status.style.color =
+  el.style.color =
     isError
       ? '#ffb3b3'
       : '#bbb';
 
-  status.classList.add(
+  el.classList.add(
     'show'
   );
 
@@ -67,7 +68,7 @@ function showStatus(
   showStatus.timer =
     setTimeout(
       () =>
-        status.classList.remove(
+        el.classList.remove(
           'show'
         ),
       3500
@@ -79,7 +80,7 @@ function showStatus(
    BOOT / NETFLIX INTRO
 ========================================================= */
 
-function revealProfileScreen() {
+function finishIntro() {
 
   const boot =
     $('#boot');
@@ -87,12 +88,8 @@ function revealProfileScreen() {
   const profiles =
     $('#profiles');
 
-  /*
-    Very important:
-    remove the permanent black Netflix N layer.
-  */
-
   if (boot) {
+
     boot.style.opacity =
       '0';
 
@@ -109,6 +106,7 @@ function revealProfileScreen() {
   }
 
   if (profiles) {
+
     profiles.classList.add(
       'ready'
     );
@@ -117,39 +115,40 @@ function revealProfileScreen() {
 
 
 /* =========================================================
-   AUTH SESSION
+   PRIVATE SUPABASE SESSION
 ========================================================= */
 
 async function ensureSession() {
 
-  const {
-    data
-  } =
+  const existing =
     await supabase.auth.getSession();
 
-  if (data?.session) {
-    return data.session;
+  if (
+    existing?.data?.session
+  ) {
+    return existing.data.session;
   }
 
   const {
-    data: signInData,
+    data,
     error
   } =
     await supabase.auth
       .signInAnonymously();
 
   if (error) {
+
     throw new Error(
       `Anonymous sign-in failed: ${error.message}`
     );
   }
 
-  return signInData?.session;
+  return data?.session;
 }
 
 
 /* =========================================================
-   LIST PRIVATE FILES
+   LIST PRIVATE MEDIA
 ========================================================= */
 
 async function listMedia() {
@@ -169,18 +168,21 @@ async function listMedia() {
       );
 
   if (error) {
+
     throw new Error(
       `Private media list failed: ${error.message}`
     );
   }
 
-  return Array.isArray(data)
-    ? data.filter(
-        item =>
-          item &&
-          item.name
-      )
-    : [];
+  return (
+    Array.isArray(data)
+      ? data.filter(
+          item =>
+            item &&
+            item.name
+        )
+      : []
+  );
 }
 
 
@@ -204,13 +206,16 @@ async function signedUrl(
       );
 
   if (error) {
+
     throw new Error(
       `Signed URL failed for ${path}: ${error.message}`
     );
   }
 
-  return data?.signedUrl ||
-    null;
+  return (
+    data?.signedUrl ||
+    null
+  );
 }
 
 
@@ -221,6 +226,7 @@ async function signedUrl(
 function isImage(
   name
 ) {
+
   return /\.(jpe?g|png|webp|gif|avif)$/i
     .test(
       String(name || '')
@@ -231,6 +237,7 @@ function isImage(
 function isVideo(
   name
 ) {
+
   return /\.(mp4|mov|m4v|webm)$/i
     .test(
       String(name || '')
@@ -254,171 +261,45 @@ function findExact(
           .trim()
           .toLowerCase() ===
         target
-    ) || null
-  );
-}
-
-
-function findMusic() {
-
-  /*
-    Prefer filename containing
-    music/song/audio/sound.
-  */
-
-  const named =
-    state.objects.find(
-      item =>
-        /music|song|audio|sound/i
-          .test(item.name) &&
-        isVideo(item.name)
-    );
-
-  if (named) {
-    return named;
-  }
-
-  /*
-    Fallback:
-    use MP4/MOV file if there is
-    only one obvious media file.
-  */
-
-  const videos =
-    state.objects.filter(
-      item =>
-        isVideo(item.name)
-    );
-
-  return (
-    videos.find(
-      item =>
-        /\.mp4$/i
-          .test(item.name)
     ) ||
     null
   );
 }
 
 
-/* =========================================================
-   PROFILE CARDS
-   Creates them IMMEDIATELY so the
-   Netflix screen never waits for Supabase.
-========================================================= */
+function findMusic() {
 
-function createProfileCard({
-  name,
-  label,
-  active
-}) {
-
-  const button =
-    document.createElement(
-      'button'
-    );
-
-  button.type =
-    'button';
-
-  button.className =
-    `profile-card${
-      active
-        ? ' active'
-        : ''
-    }`;
-
-  const avatar =
-    document.createElement(
-      'div'
-    );
-
-  avatar.className =
-    'profile-avatar';
-
-  /*
-    Temporary fallback so profile
-    never appears empty.
-  */
-
-  avatar.textContent =
-    active
-      ? 'M'
-      : '♥';
-
-  avatar.style.display =
-    'grid';
-
-  avatar.style.placeItems =
-    'center';
-
-  avatar.style.fontSize =
-    'clamp(35px,7vw,70px)';
-
-  avatar.style.fontWeight =
-    '900';
-
-  avatar.style.color =
-    '#fff';
-
-  avatar.style.background =
-    active
-      ? 'linear-gradient(135deg,#8b0000,#e50914)'
-      : '#222';
-
-  const nameEl =
-    document.createElement(
-      'div'
-    );
-
-  nameEl.className =
-    'profile-name';
-
-  nameEl.textContent =
-    name;
-
-  const badge =
-    document.createElement(
-      'div'
-    );
-
-  badge.className =
-    'profile-badge';
-
-  badge.textContent =
-    label;
-
-  button.append(
-    avatar,
-    nameEl,
-    badge
-  );
-
-  if (active) {
-
-    button.addEventListener(
-      'click',
-      selectMinku
-    );
-
-  } else {
-
-    button.addEventListener(
-      'click',
-      () =>
-        showStatus(
-          'This profile is private. ❤️'
+  const namedMusic =
+    state.objects.find(
+      item =>
+        /music|song|audio|sound/i
+          .test(
+            item.name
+          ) &&
+        isVideo(
+          item.name
         )
     );
+
+  if (namedMusic) {
+    return namedMusic;
   }
 
-  return {
-    button,
-    avatar,
-    active
-  };
+  const mp4 =
+    state.objects.find(
+      item =>
+        /\.mp4$/i.test(
+          item.name
+        )
+    );
+
+  return mp4 || null;
 }
 
+
+/* =========================================================
+   CREATE PROFILE SCREEN IMMEDIATELY
+========================================================= */
 
 function buildProfileSkeleton() {
 
@@ -429,8 +310,7 @@ function buildProfileSkeleton() {
     console.error(
       'profileGrid not found'
     );
-
-    return;
+    return [];
   }
 
   grid.innerHTML =
@@ -439,68 +319,161 @@ function buildProfileSkeleton() {
   const profiles = [
     {
       name: 'Minku',
-      label: '🎂❤️',
+      badge: '❤️',
       active: true
     },
     {
       name: 'Yuvi',
-      label: '✨',
+      badge: '✨',
       active: false
     },
     {
       name: 'Memories',
-      label: '💕',
+      badge: '💕',
       active: false
     },
     {
       name: 'Friends',
-      label: '🥰',
+      badge: '🥰',
       active: false
     }
   ];
 
-  const cards =
-    [];
+  const buttons = [];
 
   profiles.forEach(
     profile => {
 
-      const card =
-        createProfileCard(
-          profile
+      const button =
+        document.createElement(
+          'button'
         );
 
-      cards.push(
-        card
+      button.type =
+        'button';
+
+      button.className =
+        `profile-card${
+          profile.active
+            ? ' active'
+            : ''
+        }`;
+
+
+      const avatar =
+        document.createElement(
+          'div'
+        );
+
+      avatar.className =
+        'profile-avatar';
+
+      avatar.textContent =
+        profile.active
+          ? 'M'
+          : '♥';
+
+      avatar.style.display =
+        'grid';
+
+      avatar.style.placeItems =
+        'center';
+
+      avatar.style.fontSize =
+        'clamp(42px,7vw,72px)';
+
+      avatar.style.fontWeight =
+        '900';
+
+      avatar.style.color =
+        '#fff';
+
+      avatar.style.background =
+        profile.active
+          ? 'linear-gradient(135deg,#4a0505,#e50914)'
+          : '#222';
+
+
+      const name =
+        document.createElement(
+          'div'
+        );
+
+      name.className =
+        'profile-name';
+
+      name.textContent =
+        profile.name;
+
+
+      const badge =
+        document.createElement(
+          'div'
+        );
+
+      badge.className =
+        'profile-badge';
+
+      badge.textContent =
+        profile.badge;
+
+
+      button.append(
+        avatar,
+        name,
+        badge
       );
 
+
+      if (
+        profile.active
+      ) {
+
+        button.addEventListener(
+          'click',
+          selectMinku
+        );
+
+      } else {
+
+        button.addEventListener(
+          'click',
+          () =>
+            showStatus(
+              'This profile is private. ❤️'
+            )
+        );
+      }
+
+
       grid.appendChild(
-        card.button
+        button
+      );
+
+      buttons.push(
+        button
       );
     }
   );
 
-  return cards;
+  return buttons;
 }
 
 
 /* =========================================================
-   LOAD ACTUAL PROFILE IMAGES
+   LOAD PROFILE IMAGES AFTER SCREEN IS VISIBLE
 ========================================================= */
 
-async function hydrateProfileImages() {
+async function hydrateProfileImages(
+  buttons
+) {
 
-  const grid =
-    $('#profileGrid');
-
-  if (!grid) return;
-
-  const cards =
-    Array.from(
-      grid.querySelectorAll(
-        '.profile-card'
-      )
-    );
+  if (
+    !buttons ||
+    !buttons.length
+  ) {
+    return;
+  }
 
   const allImages =
     state.objects.filter(
@@ -510,111 +483,109 @@ async function hydrateProfileImages() {
         )
     );
 
-  /*
-    Minku MUST use Photo 2.
-  */
-
-  const minkuProfile =
+  const minku =
     findExact(
       PROFILE_FILE
     ) ||
     allImages[0] ||
     null;
 
-  const alternateImages =
+  const alternates =
     allImages.filter(
       item =>
         item.name !==
-        minkuProfile?.name
+        minku?.name
     );
 
-  const selectedImages = [
-    minkuProfile,
-    alternateImages[0] ||
-      minkuProfile,
-    alternateImages[1] ||
-      minkuProfile,
-    alternateImages[2] ||
-      minkuProfile
+
+  const selected = [
+    minku,
+    alternates[0] || minku,
+    alternates[1] || minku,
+    alternates[2] || minku
   ];
 
-  for (
-    let i = 0;
-    i < cards.length;
-    i++
-  ) {
 
-    const object =
-      selectedImages[i];
+  await Promise.all(
+    buttons.map(
+      async (
+        button,
+        index
+      ) => {
 
-    if (!object) {
-      continue;
-    }
+        const object =
+          selected[index];
 
-    const avatar =
-      cards[i].querySelector(
-        '.profile-avatar'
-      );
+        if (!object) {
+          return;
+        }
 
-    if (!avatar) {
-      continue;
-    }
+        const avatar =
+          button.querySelector(
+            '.profile-avatar'
+          );
 
-    try {
+        if (!avatar) {
+          return;
+        }
 
-      const url =
-        await signedUrl(
-          object.name
-        );
+        try {
 
-      const img =
-        document.createElement(
-          'img'
-        );
+          const url =
+            await signedUrl(
+              object.name
+            );
 
-      img.src =
-        url;
+          const img =
+            document.createElement(
+              'img'
+            );
 
-      img.alt =
-        i === 0
-          ? 'Minku'
-          : 'Birthday profile';
+          img.src =
+            url;
 
-      img.style.width =
-        '100%';
+          img.alt =
+            index === 0
+              ? 'Minku'
+              : 'Profile';
 
-      img.style.height =
-        '100%';
+          img.style.width =
+            '100%';
 
-      img.style.objectFit =
-        'cover';
+          img.style.height =
+            '100%';
 
-      img.style.display =
-        'block';
+          img.style.objectFit =
+            'cover';
 
-      avatar.textContent =
-        '';
+          img.style.display =
+            'block';
 
-      avatar.style.display =
-        'block';
+          avatar.textContent =
+            '';
 
-      avatar.appendChild(
-        img
-      );
+          avatar.style.display =
+            'block';
 
-    } catch (error) {
+          avatar.appendChild(
+            img
+          );
 
-      console.error(
-        'Profile image error:',
-        error
-      );
-    }
-  }
+        } catch (error) {
+
+          console.error(
+            'Profile image error:',
+            error
+          );
+        }
+      }
+    )
+  );
 }
 
 
 /* =========================================================
-   LOAD PHOTOS
+   PHOTOS
 ========================================================= */
 
 async function loadPhotos() {
@@ -639,6 +610,7 @@ async function loadPhotos() {
           PROFILE_FILE
     );
 
+
   for (
     let i = 0;
     i < photos.length;
@@ -656,6 +628,7 @@ async function loadPhotos() {
     card.className =
       'photo-card';
 
+
     const frame =
       document.createElement(
         'div'
@@ -663,6 +636,7 @@ async function loadPhotos() {
 
     frame.className =
       'photo-frame';
+
 
     const img =
       document.createElement(
@@ -676,6 +650,7 @@ async function loadPhotos() {
 
     img.loading =
       'lazy';
+
 
     try {
 
@@ -691,9 +666,11 @@ async function loadPhotos() {
       );
     }
 
+
     frame.appendChild(
       img
     );
+
 
     const title =
       document.createElement(
@@ -708,10 +685,12 @@ async function loadPhotos() {
         i + 1
       } ❤️`;
 
+
     card.append(
       frame,
       title
     );
+
 
     card.addEventListener(
       'click',
@@ -723,6 +702,7 @@ async function loadPhotos() {
         )
     );
 
+
     row.appendChild(
       card
     );
@@ -731,7 +711,7 @@ async function loadPhotos() {
 
 
 /* =========================================================
-   LOAD VIDEOS
+   VIDEOS
 ========================================================= */
 
 async function loadVideos() {
@@ -759,6 +739,7 @@ async function loadVideos() {
           music?.name
     );
 
+
   for (
     let i = 0;
     i < videos.length;
@@ -768,6 +749,7 @@ async function loadVideos() {
     const object =
       videos[i];
 
+
     const card =
       document.createElement(
         'article'
@@ -776,6 +758,7 @@ async function loadVideos() {
     card.className =
       'video-card';
 
+
     const thumb =
       document.createElement(
         'div'
@@ -783,6 +766,7 @@ async function loadVideos() {
 
     thumb.className =
       'thumb';
+
 
     const video =
       document.createElement(
@@ -798,6 +782,7 @@ async function loadVideos() {
     video.preload =
       'metadata';
 
+
     try {
 
       video.src =
@@ -812,9 +797,11 @@ async function loadVideos() {
       );
     }
 
+
     thumb.appendChild(
       video
     );
+
 
     const title =
       document.createElement(
@@ -829,6 +816,7 @@ async function loadVideos() {
         i + 1
       } — A Moment Worth Keeping 🎬`;
 
+
     const meta =
       document.createElement(
         'div'
@@ -840,11 +828,13 @@ async function loadVideos() {
     meta.textContent =
       'MINKU ORIGINAL';
 
+
     card.append(
       thumb,
       title,
       meta
     );
+
 
     card.addEventListener(
       'click',
@@ -856,6 +846,7 @@ async function loadVideos() {
         )
     );
 
+
     row.appendChild(
       card
     );
@@ -864,21 +855,7 @@ async function loadVideos() {
 
 
 /* =========================================================
-   LOAD ALL MEDIA
-========================================================= */
-
-async function loadMedia() {
-
-  await Promise.allSettled([
-    loadPhotos(),
-    loadVideos(),
-    prepareMusic()
-  ]);
-}
-
-
-/* =========================================================
-   MUSIC
+   LOAD MUSIC
 ========================================================= */
 
 async function prepareMusic() {
@@ -888,12 +865,14 @@ async function prepareMusic() {
 
   if (!music) {
 
-    console.warn(
-      'No music MP4/MOV detected.'
+    showStatus(
+      'Music MP4 was not found in the private bucket.',
+      true
     );
 
     return;
   }
+
 
   try {
 
@@ -902,12 +881,14 @@ async function prepareMusic() {
         music.name
       );
 
+
     const player =
       $('#musicPlayer');
 
     if (!player) {
       return;
     }
+
 
     player.src =
       state.musicUrl;
@@ -921,7 +902,6 @@ async function prepareMusic() {
   } catch (error) {
 
     console.error(
-      'Music error:',
       error
     );
 
@@ -932,6 +912,10 @@ async function prepareMusic() {
   }
 }
 
+
+/* =========================================================
+   START MUSIC
+========================================================= */
 
 async function startMusic() {
 
@@ -944,6 +928,7 @@ async function startMusic() {
   ) {
     return;
   }
+
 
   try {
 
@@ -981,7 +966,7 @@ async function startMusic() {
 
 
 /* =========================================================
-   OPEN MAIN NETFLIX HOME
+   OPEN NETFLIX HOME
 ========================================================= */
 
 function showApp() {
@@ -994,12 +979,13 @@ function showApp() {
     profiles.style.opacity =
       '0';
 
-    profiles.style.pointerEvents =
-      'none';
-
     profiles.style.visibility =
       'hidden';
+
+    profiles.style.pointerEvents =
+      'none';
   }
+
 
   const app =
     $('#app');
@@ -1008,19 +994,18 @@ function showApp() {
     return;
   }
 
+
   app.classList.remove(
     'hidden'
   );
 
   requestAnimationFrame(
-    () => {
-
+    () =>
       app.classList.add(
         'ready'
-      );
-
-    }
+      )
   );
+
 
   const musicButton =
     $('#musicButton');
@@ -1036,9 +1021,7 @@ function showApp() {
 
 async function selectMinku() {
 
-  if (
-    state.selected
-  ) {
+  if (state.selected) {
     return;
   }
 
@@ -1046,11 +1029,6 @@ async function selectMinku() {
     true;
 
   showApp();
-
-  /*
-    Minku's profile click is a user
-    gesture, so music can start here.
-  */
 
   await startMusic();
 
@@ -1084,8 +1062,10 @@ function openViewer(
     return;
   }
 
+
   media.innerHTML =
     '';
+
 
   if (
     type ===
@@ -1126,6 +1106,7 @@ function openViewer(
     video.playsInline =
       true;
 
+
     video.addEventListener(
       'play',
       () => {
@@ -1139,16 +1120,19 @@ function openViewer(
       }
     );
 
+
     video.addEventListener(
       'ended',
       () =>
         startMusic()
     );
 
+
     media.appendChild(
       video
     );
   }
+
 
   viewer.classList.remove(
     'hidden'
@@ -1178,12 +1162,14 @@ function closeViewer() {
     );
   }
 
+
   const video =
     $('#viewerMedia video');
 
   if (video) {
     video.pause();
   }
+
 
   const media =
     $('#viewerMedia');
@@ -1196,151 +1182,33 @@ function closeViewer() {
 
 
 /* =========================================================
-   BUTTONS
-========================================================= */
-
-const viewerClose =
-  $('#viewerClose');
-
-if (viewerClose) {
-
-  viewerClose.addEventListener(
-    'click',
-    closeViewer
-  );
-}
-
-
-const viewer =
-  $('#viewer');
-
-if (viewer) {
-
-  viewer.addEventListener(
-    'click',
-    event => {
-
-      if (
-        event.target ===
-        viewer
-      ) {
-        closeViewer();
-      }
-    }
-  );
-}
-
-
-document.addEventListener(
-  'keydown',
-  event => {
-
-    if (
-      event.key ===
-      'Escape'
-    ) {
-
-      closeViewer();
-    }
-  }
-);
-
-
-const playStory =
-  $('#playStory');
-
-if (playStory) {
-
-  playStory.addEventListener(
-    'click',
-    () => {
-
-      const episodes =
-        $('#episodes');
-
-      if (!episodes) {
-        return;
-      }
-
-      window.scrollTo({
-        top:
-          episodes.offsetTop -
-          58,
-        behavior:
-          'smooth'
-      });
-    }
-  );
-}
-
-
-const musicButton =
-  $('#musicButton');
-
-if (musicButton) {
-
-  musicButton.addEventListener(
-    'click',
-    async () => {
-
-      const player =
-        $('#musicPlayer');
-
-      if (!player) {
-        return;
-      }
-
-      if (
-        player.paused
-      ) {
-
-        await startMusic();
-
-      } else {
-
-        player.pause();
-
-        musicButton.textContent =
-          '▶ PLAY MUSIC';
-      }
-    }
-  );
-}
-
-
-/* =========================================================
    MAIN INITIALIZATION
 ========================================================= */
 
 async function init() {
 
   /*
-    FIRST:
-    create visible Netflix profile
-    placeholders immediately.
+    THIS IS THE IMPORTANT FIX:
+    Build the profile UI FIRST.
+    Supabase must never block Netflix intro.
   */
 
-  buildProfileSkeleton();
+  const profileButtons =
+    buildProfileSkeleton();
 
 
   /*
-    Reveal profile screen after
-    Netflix N animation.
+    Wait only for the Netflix N animation.
   */
 
   setTimeout(
-    () => {
-
-      revealProfileScreen();
-
-    },
+    finishIntro,
     2300
   );
 
 
   /*
-    THEN:
-    private media loads in background.
+    Load private media in background.
   */
 
   try {
@@ -1362,20 +1230,29 @@ async function init() {
 
 
     /*
-      Replace Minku placeholder
-      with private Photo 2.
+      Update the profile images
+      after the screen is already visible.
     */
 
-    await hydrateProfileImages();
+    hydrateProfileImages(
+      profileButtons
+    );
 
 
     /*
-      Load remaining photos,
-      videos and music.
+      Photos, videos and music
+      load independently.
     */
 
-    await loadMedia();
+    await Promise.allSettled([
 
+      loadPhotos(),
+
+      loadVideos(),
+
+      prepareMusic()
+
+    ]);
 
   } catch (error) {
 
@@ -1390,16 +1267,146 @@ async function init() {
     );
 
     /*
-      Even if private media has
-      a problem, Netflix intro
-      must still work.
+      Never block Netflix profile screen
+      because of private-media problems.
     */
   }
 }
 
 
 /* =========================================================
-   START
+   EVENTS
+========================================================= */
+
+if ($('#viewerClose')) {
+
+  $('#viewerClose')
+    .addEventListener(
+      'click',
+      closeViewer
+    );
+}
+
+
+if ($('#viewer')) {
+
+  $('#viewer')
+    .addEventListener(
+      'click',
+      event => {
+
+        if (
+          event.target.id ===
+          'viewer'
+        ) {
+
+          closeViewer();
+        }
+      }
+    );
+}
+
+
+document.addEventListener(
+  'keydown',
+  event => {
+
+    if (
+      event.key ===
+      'Escape'
+    ) {
+
+      closeViewer();
+    }
+  }
+);
+
+
+if ($('#playStory')) {
+
+  $('#playStory')
+    .addEventListener(
+      'click',
+      () => {
+
+        const episodes =
+          $('#episodes');
+
+        if (!episodes) {
+          return;
+        }
+
+        window.scrollTo({
+          top:
+            episodes.offsetTop -
+            58,
+          behavior:
+            'smooth'
+        });
+      }
+    );
+}
+
+
+if ($('#musicButton')) {
+
+  $('#musicButton')
+    .addEventListener(
+      'click',
+      async () => {
+
+        const player =
+          $('#musicPlayer');
+
+        if (!player) {
+          return;
+        }
+
+        if (
+          player.paused
+        ) {
+
+          await startMusic();
+
+        } else {
+
+          player.pause();
+
+          $('#musicButton')
+            .textContent =
+            '▶ PLAY MUSIC';
+        }
+      }
+    );
+}
+
+
+/*
+  First user gesture can also start music.
+*/
+
+document.addEventListener(
+  'pointerdown',
+  () => {
+
+    if (
+      state.selected &&
+      $('#musicPlayer')?.paused
+    ) {
+
+      startMusic();
+    }
+
+  },
+  {
+    once: true,
+    passive: true
+  }
+);
+
+
+/* =========================================================
+   START APP
 ========================================================= */
 
 init();
