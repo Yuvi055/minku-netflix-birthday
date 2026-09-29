@@ -1,44 +1,1082 @@
-async function init() {
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-  // IMPORTANT:
-  // Netflix profile screen should appear independently
-  // of private-media loading.
+const SUPABASE_URL = 'https://yqjbjzmedunclslhvrro.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_1ZHJWTv1mcBaJuh6fyCtrg_Plv9q9fn';
+const BUCKET = 'minku-private-media';
+const PROFILE_FILE = 'Photo 2.JPG.jpeg';
 
-  setTimeout(() => {
-    const profiles = $('#profiles');
-
-    if (profiles) {
-      profiles.classList.add('ready');
+const supabase = createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false
     }
-  }, 2200);
+  }
+);
+
+const $ = (sel) => document.querySelector(sel);
+
+const state = {
+  objects: [],
+  musicUrl: '',
+  selected: false
+};
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+function showStatus(message, error = false) {
+  const el = $('#status');
+
+  if (!el) return;
+
+  el.textContent = message;
+  el.classList.add('show');
+
+  el.style.color = error
+    ? '#ffb3b3'
+    : '#bbb';
+
+  clearTimeout(showStatus.timer);
+
+  showStatus.timer = setTimeout(() => {
+    el.classList.remove('show');
+  }, 3200);
+}
+
+
+/* =========================================================
+   SUPABASE SESSION
+========================================================= */
+
+async function ensureSession() {
+
+  const existing =
+    await supabase.auth.getSession();
+
+  if (existing.data.session) {
+    return existing.data.session;
+  }
+
+  const {
+    data,
+    error
+  } =
+    await supabase.auth.signInAnonymously();
+
+  if (error) {
+    throw new Error(
+      `Anonymous sign-in failed: ${error.message}`
+    );
+  }
+
+  return data.session;
+}
+
+
+/* =========================================================
+   LIST PRIVATE MEDIA
+========================================================= */
+
+async function listMedia() {
+
+  const {
+    data,
+    error
+  } =
+    await supabase.storage
+      .from(BUCKET)
+      .list('', {
+        limit: 100,
+        offset: 0
+      });
+
+  if (error) {
+    throw new Error(
+      `Private media list failed: ${error.message}`
+    );
+  }
+
+  return (data || [])
+    .filter(
+      x =>
+        x &&
+        x.name
+    );
+}
+
+
+/* =========================================================
+   SIGNED URL
+========================================================= */
+
+async function signedUrl(path) {
+
+  const {
+    data,
+    error
+  } =
+    await supabase.storage
+      .from(BUCKET)
+      .createSignedUrl(
+        path,
+        60 * 60
+      );
+
+  if (error) {
+    throw new Error(
+      `Signed URL failed for ${path}: ${error.message}`
+    );
+  }
+
+  return data.signedUrl;
+}
+
+
+/* =========================================================
+   FILE HELPERS
+========================================================= */
+
+function findExact(name) {
+
+  const n =
+    String(name)
+      .trim()
+      .toLowerCase();
+
+  return (
+    state.objects.find(
+      o =>
+        String(o.name)
+          .trim()
+          .toLowerCase() === n
+    ) || null
+  );
+}
+
+
+function isImage(name) {
+
+  return /\.(jpe?g|png|webp|gif|avif)$/i
+    .test(name);
+}
+
+
+function isVideo(name) {
+
+  return /\.(mp4|mov|m4v|webm)$/i
+    .test(name);
+}
+
+
+/*
+  Music is an MP4/MOV file.
+  We detect it by filename first.
+*/
+function findMusic() {
+
+  return (
+    state.objects.find(
+      o =>
+        /music|song|audio|sound/i.test(
+          o.name
+        ) &&
+        isVideo(o.name)
+    ) || null
+  );
+}
+
+
+/* =========================================================
+   NETFLIX PROFILES
+========================================================= */
+
+async function buildProfiles() {
+
+  const grid =
+    $('#profileGrid');
+
+  if (!grid) {
+    console.error(
+      'profileGrid not found'
+    );
+    return;
+  }
+
+  grid.innerHTML = '';
+
+  const allImages =
+    state.objects.filter(
+      o =>
+        isImage(o.name)
+    );
+
+  const profile =
+    findExact(
+      PROFILE_FILE
+    ) ||
+    allImages[0];
+
+  const alternates =
+    allImages
+      .filter(
+        o =>
+          o.name !==
+          profile?.name
+      )
+      .slice(0, 3);
+
+  const cards = [
+    {
+      obj:
+        alternates[0] ||
+        profile,
+      label:
+        '🎂🎈',
+      active:
+        false
+    },
+
+    {
+      obj:
+        profile,
+      label:
+        '❤️',
+      active:
+        true
+    },
+
+    {
+      obj:
+        alternates[1] ||
+        profile,
+      label:
+        '✨💕',
+      active:
+        false
+    },
+
+    {
+      obj:
+        alternates[2] ||
+        profile,
+      label:
+        '😻',
+      active:
+        false
+    }
+  ];
+
+
+  for (
+    let i = 0;
+    i < cards.length;
+    i++
+  ) {
+
+    const item =
+      cards[i];
+
+    const button =
+      document.createElement(
+        'button'
+      );
+
+    button.className =
+      `profile-card${
+        item.active
+          ? ' active'
+          : ''
+      }`;
+
+    button.type =
+      'button';
+
+
+    const avatar =
+      document.createElement(
+        'div'
+      );
+
+    avatar.className =
+      'profile-avatar';
+
+
+    const img =
+      document.createElement(
+        'img'
+      );
+
+    img.alt =
+      item.active
+        ? 'Minku'
+        : 'Profile';
+
+
+    if (item.obj) {
+
+      try {
+
+        img.src =
+          await signedUrl(
+            item.obj.name
+          );
+
+      } catch (e) {
+
+        console.error(
+          'Profile image error:',
+          e
+        );
+      }
+    }
+
+
+    avatar.appendChild(
+      img
+    );
+
+    button.appendChild(
+      avatar
+    );
+
+
+    const name =
+      document.createElement(
+        'div'
+      );
+
+    name.className =
+      'profile-name';
+
+    name.textContent =
+      item.active
+        ? 'Minku'
+        : 'Profile';
+
+    button.appendChild(
+      name
+    );
+
+
+    const badge =
+      document.createElement(
+        'div'
+      );
+
+    badge.className =
+      'profile-badge';
+
+    badge.textContent =
+      item.label;
+
+    button.appendChild(
+      badge
+    );
+
+
+    if (item.active) {
+
+      button.addEventListener(
+        'click',
+        selectMinku
+      );
+
+    } else {
+
+      button.addEventListener(
+        'click',
+        () =>
+          showStatus(
+            'This story is private. ❤️'
+          )
+      );
+    }
+
+
+    grid.appendChild(
+      button
+    );
+  }
+}
+
+
+/* =========================================================
+   LOAD PHOTOS + VIDEOS
+========================================================= */
+
+async function loadMediaRows() {
+
+  const photoRow =
+    $('#photoRow');
+
+  const videoRow =
+    $('#videoRow');
+
+  if (!photoRow || !videoRow) {
+    return;
+  }
+
+  photoRow.innerHTML = '';
+  videoRow.innerHTML = '';
+
+
+  const imageObjects =
+    state.objects.filter(
+      o =>
+        isImage(o.name) &&
+        o.name !==
+          PROFILE_FILE
+    );
+
+
+  const music =
+    findMusic();
+
+
+  const videoObjects =
+    state.objects.filter(
+      o =>
+        isVideo(o.name) &&
+        o.name !==
+          music?.name
+    );
+
+
+  /* -------------------------
+     PHOTOS
+  ------------------------- */
+
+  for (
+    let i = 0;
+    i < imageObjects.length;
+    i++
+  ) {
+
+    const obj =
+      imageObjects[i];
+
+    const card =
+      document.createElement(
+        'article'
+      );
+
+    card.className =
+      'photo-card';
+
+
+    const frame =
+      document.createElement(
+        'div'
+      );
+
+    frame.className =
+      'photo-frame';
+
+
+    const img =
+      document.createElement(
+        'img'
+      );
+
+    img.alt =
+      `Minku memory ${i + 1}`;
+
+    img.loading =
+      'lazy';
+
+
+    try {
+
+      img.src =
+        await signedUrl(
+          obj.name
+        );
+
+    } catch (e) {
+
+      console.error(
+        'Photo error:',
+        e
+      );
+    }
+
+
+    frame.appendChild(
+      img
+    );
+
+
+    const title =
+      document.createElement(
+        'div'
+      );
+
+    title.className =
+      'photo-title';
+
+    title.textContent =
+      `Beautiful Memory ${
+        i + 1
+      } ❤️`;
+
+
+    card.append(
+      frame,
+      title
+    );
+
+
+    card.addEventListener(
+      'click',
+      () =>
+        openViewer(
+          'image',
+          img.src,
+          `Beautiful Memory ${
+            i + 1
+          }`
+        )
+    );
+
+
+    photoRow.appendChild(
+      card
+    );
+  }
+
+
+  /* -------------------------
+     VIDEOS
+  ------------------------- */
+
+  for (
+    let i = 0;
+    i < videoObjects.length;
+    i++
+  ) {
+
+    const obj =
+      videoObjects[i];
+
+    const card =
+      document.createElement(
+        'article'
+      );
+
+    card.className =
+      'video-card';
+
+
+    const thumb =
+      document.createElement(
+        'div'
+      );
+
+    thumb.className =
+      'thumb';
+
+
+    const video =
+      document.createElement(
+        'video'
+      );
+
+    video.muted =
+      true;
+
+    video.playsInline =
+      true;
+
+    video.preload =
+      'metadata';
+
+
+    try {
+
+      video.src =
+        await signedUrl(
+          obj.name
+        );
+
+    } catch (e) {
+
+      console.error(
+        'Video error:',
+        e
+      );
+    }
+
+
+    thumb.appendChild(
+      video
+    );
+
+
+    const title =
+      document.createElement(
+        'div'
+      );
+
+    title.className =
+      'video-title';
+
+    title.textContent =
+      `Episode ${
+        i + 1
+      } — A Moment Worth Keeping 🎬`;
+
+
+    const meta =
+      document.createElement(
+        'div'
+      );
+
+    meta.className =
+      'video-meta';
+
+    meta.textContent =
+      'MINKU ORIGINAL';
+
+
+    card.append(
+      thumb,
+      title,
+      meta
+    );
+
+
+    card.addEventListener(
+      'click',
+      () =>
+        openViewer(
+          'video',
+          video.src,
+          `Episode ${
+            i + 1
+          }`
+        )
+    );
+
+
+    videoRow.appendChild(
+      card
+    );
+  }
+}
+
+
+/* =========================================================
+   MUSIC
+========================================================= */
+
+async function prepareMusic() {
+
+  const music =
+    findMusic();
+
+  if (!music) {
+
+    showStatus(
+      'Music MP4 was not found in the private bucket.',
+      true
+    );
+
+    return;
+  }
 
 
   try {
 
-    // Start private session in background
+    state.musicUrl =
+      await signedUrl(
+        music.name
+      );
+
+
+    const player =
+      $('#musicPlayer');
+
+    if (!player) {
+      return;
+    }
+
+
+    player.src =
+      state.musicUrl;
+
+    player.loop =
+      true;
+
+    player.volume =
+      0.38;
+
+
+  } catch (e) {
+
+    console.error(
+      e
+    );
+
+    showStatus(
+      e.message,
+      true
+    );
+  }
+}
+
+
+/* =========================================================
+   START MUSIC
+========================================================= */
+
+async function startMusic() {
+
+  const player =
+    $('#musicPlayer');
+
+  if (
+    !player ||
+    !state.musicUrl
+  ) {
+    return;
+  }
+
+
+  try {
+
+    await player.play();
+
+    const button =
+      $('#musicButton');
+
+    if (button) {
+
+      button.classList.remove(
+        'hidden'
+      );
+
+      button.textContent =
+        '🔊 MUSIC ON';
+    }
+
+
+  } catch (e) {
+
+    const button =
+      $('#musicButton');
+
+    if (button) {
+
+      button.classList.remove(
+        'hidden'
+      );
+
+      button.textContent =
+        '▶ PLAY MUSIC';
+    }
+  }
+}
+
+
+/* =========================================================
+   SHOW NETFLIX HOME
+========================================================= */
+
+function showApp() {
+
+  const profiles =
+    $('#profiles');
+
+  if (profiles) {
+
+    profiles.classList.remove(
+      'ready'
+    );
+
+    profiles.style.display =
+      'none';
+  }
+
+
+  const app =
+    $('#app');
+
+  if (!app) {
+    return;
+  }
+
+  app.classList.remove(
+    'hidden'
+  );
+
+
+  requestAnimationFrame(
+    () => {
+      app.classList.add(
+        'ready'
+      );
+    }
+  );
+
+
+  const musicButton =
+    $('#musicButton');
+
+  if (musicButton) {
+
+    musicButton.classList.remove(
+      'hidden'
+    );
+  }
+}
+
+
+/* =========================================================
+   MINKU PROFILE SELECT
+========================================================= */
+
+async function selectMinku() {
+
+  if (
+    state.selected
+  ) {
+    return;
+  }
+
+  state.selected =
+    true;
+
+
+  showApp();
+
+
+  await startMusic();
+
+
+  window.scrollTo({
+    top: 0,
+    behavior:
+      'smooth'
+  });
+}
+
+
+/* =========================================================
+   FULLSCREEN VIEWER
+========================================================= */
+
+function openViewer(
+  type,
+  src,
+  title
+) {
+
+  const viewer =
+    $('#viewer');
+
+  const media =
+    $('#viewerMedia');
+
+
+  if (
+    !viewer ||
+    !media
+  ) {
+    return;
+  }
+
+
+  media.innerHTML =
+    '';
+
+
+  if (
+    type ===
+    'image'
+  ) {
+
+    const img =
+      document.createElement(
+        'img'
+      );
+
+    img.src =
+      src;
+
+    img.alt =
+      title;
+
+    media.appendChild(
+      img
+    );
+
+
+  } else {
+
+    const video =
+      document.createElement(
+        'video'
+      );
+
+    video.src =
+      src;
+
+    video.controls =
+      true;
+
+    video.autoplay =
+      true;
+
+    video.playsInline =
+      true;
+
+
+    video.addEventListener(
+      'play',
+      () => {
+
+        const music =
+          $('#musicPlayer');
+
+        if (music) {
+          music.pause();
+        }
+      }
+    );
+
+
+    video.addEventListener(
+      'ended',
+      () =>
+        startMusic()
+    );
+
+
+    media.appendChild(
+      video
+    );
+  }
+
+
+  viewer.classList.remove(
+    'hidden'
+  );
+
+  viewer.setAttribute(
+    'aria-hidden',
+    'false'
+  );
+}
+
+
+function closeViewer() {
+
+  const viewer =
+    $('#viewer');
+
+  if (viewer) {
+
+    viewer.classList.add(
+      'hidden'
+    );
+
+    viewer.setAttribute(
+      'aria-hidden',
+      'true'
+    );
+  }
+
+
+  const video =
+    $('#viewerMedia video');
+
+  if (video) {
+    video.pause();
+  }
+
+
+  const media =
+    $('#viewerMedia');
+
+  if (media) {
+    media.innerHTML =
+      '';
+  }
+}
+
+
+/* =========================================================
+   MAIN INIT
+========================================================= */
+
+async function init() {
+
+  /*
+    VERY IMPORTANT:
+    Reveal Netflix profile screen independently
+    of private-media loading.
+  */
+
+  setTimeout(
+    () => {
+
+      const profiles =
+        $('#profiles');
+
+      if (profiles) {
+
+        profiles.classList.add(
+          'ready'
+        );
+      }
+
+    },
+    2200
+  );
+
+
+  try {
+
     await ensureSession();
 
-    // Get private files
-    state.objects = await listMedia();
+
+    state.objects =
+      await listMedia();
+
 
     console.info(
       '[Minku private media] files:',
       state.objects.map(
-        x => x.name
+        x =>
+          x.name
       )
     );
 
 
-    // Build Netflix profiles
-    // This can finish after the profile screen
-    // is already visible.
+    /*
+      Profiles are built separately.
+    */
+
     await buildProfiles();
 
 
-    // Load photos/videos/music independently
+    /*
+      Photos, videos and music
+      load independently.
+    */
+
     await Promise.allSettled([
+
       loadMediaRows(),
+
       prepareMusic()
+
     ]);
 
 
@@ -49,20 +1087,180 @@ async function init() {
       error
     );
 
+
     showStatus(
       error.message,
       true
     );
 
-    // The Netflix profile screen
-    // must still remain available.
+
+    /*
+      Even if Supabase has an issue,
+      Netflix profile screen still appears.
+    */
+
     const profiles =
       $('#profiles');
 
     if (profiles) {
+
       profiles.classList.add(
         'ready'
       );
     }
   }
 }
+
+
+/* =========================================================
+   VIEWER EVENTS
+========================================================= */
+
+const viewerClose =
+  $('#viewerClose');
+
+if (viewerClose) {
+
+  viewerClose.addEventListener(
+    'click',
+    closeViewer
+  );
+}
+
+
+const viewer =
+  $('#viewer');
+
+if (viewer) {
+
+  viewer.addEventListener(
+    'click',
+    (e) => {
+
+      if (
+        e.target.id ===
+        'viewer'
+      ) {
+
+        closeViewer();
+      }
+    }
+  );
+}
+
+
+document.addEventListener(
+  'keydown',
+  (e) => {
+
+    if (
+      e.key ===
+      'Escape'
+    ) {
+
+      closeViewer();
+    }
+  }
+);
+
+
+/* =========================================================
+   PLAY STORY
+========================================================= */
+
+const playStory =
+  $('#playStory');
+
+if (playStory) {
+
+  playStory.addEventListener(
+    'click',
+    () => {
+
+      const episodes =
+        $('#episodes');
+
+      if (!episodes) {
+        return;
+      }
+
+      window.scrollTo({
+        top:
+          episodes.offsetTop -
+          58,
+        behavior:
+          'smooth'
+      });
+    }
+  );
+}
+
+
+/* =========================================================
+   MUSIC BUTTON
+========================================================= */
+
+const musicButton =
+  $('#musicButton');
+
+if (musicButton) {
+
+  musicButton.addEventListener(
+    'click',
+    async () => {
+
+      const player =
+        $('#musicPlayer');
+
+      if (!player) {
+        return;
+      }
+
+
+      if (
+        player.paused
+      ) {
+
+        await startMusic();
+
+      } else {
+
+        player.pause();
+
+        musicButton.textContent =
+          '▶ PLAY MUSIC';
+      }
+    }
+  );
+}
+
+
+/* =========================================================
+   FIRST USER GESTURE
+========================================================= */
+
+document.addEventListener(
+  'pointerdown',
+  () => {
+
+    if (
+      state.selected &&
+      $('#musicPlayer')?.paused
+    ) {
+
+      startMusic();
+    }
+
+  },
+  {
+    once: true,
+    passive: true
+  }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+init();
