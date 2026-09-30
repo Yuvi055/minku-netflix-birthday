@@ -86,113 +86,451 @@ a{
   z-index:5;
 }
 
-/* ================= PROFILES ================= */
+/* ================= PREMIUM PROFILE SCREEN ================= */
 
 #profiles{
   position:fixed;
   inset:0;
   z-index:4000;
-  background:#000;
   display:none;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  padding:35px 20px;
+  padding:40px 20px;
+  overflow:hidden;
+
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      rgba(255,255,255,.06),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(229,9,20,.07),
+      transparent 38%
+    ),
+    linear-gradient(
+      180deg,
+      #050505 0%,
+      #000 100%
+    );
 }
 
 #profiles.ready{
   display:flex;
 }
 
+#profiles::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.02) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      rgba(255,255,255,.02) 1px,
+      transparent 1px
+    );
+
+  background-size:80px 80px;
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      transparent,
+      #000 25%,
+      #000 75%,
+      transparent
+    );
+
+  opacity:.18;
+}
+
+/* NETFLIX LOGO — UNCHANGED */
+
 .nf-wordmark{
   position:absolute;
   left:5vw;
   top:4vw;
+  z-index:2;
+
   color:#e50914;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
   font-weight:900;
-  font-size:clamp(30px,4vw,60px);
+
+  font-size:
+    clamp(30px,4vw,60px);
+
   letter-spacing:-.06em;
+
+  text-shadow:
+    0 0 20px
+    rgba(229,9,20,.08);
 }
+
+/* MAIN PROFILE TITLE */
 
 #profiles h1{
-  margin:0 0 34px;
-  font-family:Georgia,serif;
-  font-size:clamp(34px,5vw,64px);
-  font-weight:500;
+  position:relative;
+  z-index:2;
+
+  margin:
+    0 0 48px;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(42px,5.2vw,74px);
+
+  line-height:1;
+
+  font-weight:400;
+
+  font-style:italic;
+
+  letter-spacing:-.04em;
+
+  color:#f4efea;
+
+  text-shadow:
+    0 8px 35px
+    rgba(0,0,0,.55);
 }
+
+/* PROFILE GRID */
 
 #profileGrid{
+  position:relative;
+  z-index:2;
+
   display:flex;
+
   justify-content:center;
+
   align-items:flex-start;
-  gap:clamp(16px,3vw,36px);
+
+  gap:
+    clamp(24px,3.6vw,50px);
+
   flex-wrap:wrap;
-  max-width:950px;
+
+  max-width:1100px;
 }
 
+/* PROFILE CARD */
+
 .profile-card{
-  width:clamp(125px,15vw,175px);
+  position:relative;
+
+  width:
+    clamp(135px,15vw,185px);
+
   border:0;
+
   background:none;
-  color:#777;
+
+  color:#8e8a86;
+
   text-align:center;
+
   padding:0;
-  transition:.22s;
+
+  transition:
+    transform .35s ease,
+    color .35s ease;
 }
 
 .profile-card:hover{
-  transform:scale(1.05);
+  transform:
+    translateY(-8px);
+
   color:#fff;
 }
+
+/* PREMIUM PROFILE FRAME */
 
 .profile-avatar{
+  position:relative;
+
   width:100%;
+
   aspect-ratio:1;
-  border-radius:4px;
+
+  padding:5px;
+
+  border-radius:16px;
+
   overflow:hidden;
-  background:#222;
-  border:2px solid transparent;
+
   display:grid;
+
   place-items:center;
-  color:#fff;
-  font-weight:900;
-  font-size:48px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.75),
+      rgba(255,255,255,.16) 42%,
+      rgba(229,9,20,.20) 100%
+    );
+
+  box-shadow:
+    0 18px 50px
+    rgba(0,0,0,.60),
+
+    0 0 0 1px
+    rgba(255,255,255,.06);
+
+  transition:
+    transform .4s ease,
+    box-shadow .4s ease;
 }
 
-.profile-card.active .profile-avatar{
-  border-color:#fff;
+/* INNER BORDER */
+
+.profile-avatar::before{
+  content:"";
+
+  position:absolute;
+
+  inset:5px;
+
+  z-index:3;
+
+  border:
+    1px solid
+    rgba(255,255,255,.26);
+
+  border-radius:11px;
+
+  pointer-events:none;
 }
+
+/* GLOW */
+
+.profile-avatar::after{
+  content:"";
+
+  position:absolute;
+
+  inset:-30%;
+
+  z-index:4;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255,255,255,.16),
+      transparent 54%
+    );
+
+  opacity:0;
+
+  transition:
+    opacity .4s ease;
+
+  pointer-events:none;
+}
+
+.profile-card:hover .profile-avatar{
+  transform:scale(1.045);
+
+  box-shadow:
+    0 24px 60px
+    rgba(0,0,0,.72),
+
+    0 0 32px
+    rgba(255,255,255,.08);
+}
+
+.profile-card:hover .profile-avatar::after{
+  opacity:1;
+}
+
+/* IMAGE */
 
 .profile-avatar img{
+  position:relative;
+
+  z-index:1;
+
   width:100%;
   height:100%;
+
   object-fit:cover;
+
   display:block;
+
+  border-radius:11px;
+
+  transition:
+    transform .5s ease,
+    filter .5s ease;
 }
+
+.profile-card:hover .profile-avatar img{
+  transform:scale(1.055);
+
+  filter:
+    brightness(1.06)
+    contrast(1.03);
+}
+
+/* ACTIVE MINKU */
+
+.profile-card.active .profile-avatar{
+  background:
+    linear-gradient(
+      135deg,
+      #fff,
+      rgba(255,255,255,.22),
+      #e50914
+    );
+
+  box-shadow:
+    0 0 0 1px
+    rgba(255,255,255,.10),
+
+    0 22px 60px
+    rgba(0,0,0,.70),
+
+    0 0 34px
+    rgba(229,9,20,.12);
+}
+
+/* PROFILE NAME */
 
 .profile-name{
-  margin-top:12px;
-  font-size:clamp(15px,1.8vw,24px);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  margin-top:18px;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(19px,2vw,27px);
+
+  font-weight:400;
+
+  letter-spacing:.02em;
+
+  color:#ddd6d0;
+
+  text-shadow:
+    0 4px 18px
+    rgba(0,0,0,.75);
+
+  transition:
+    color .3s ease,
+    transform .3s ease,
+    letter-spacing .3s ease;
 }
+
+.profile-card:hover .profile-name{
+  color:#fff;
+
+  transform:
+    translateY(-2px);
+
+  letter-spacing:.045em;
+}
+
+/* PROFILE BADGE */
 
 .profile-badge{
-  margin-top:5px;
-  min-height:21px;
+  margin-top:8px;
+
+  min-height:22px;
+
+  font-size:17px;
+
+  opacity:.95;
+
+  filter:
+    drop-shadow(
+      0 4px 10px
+      rgba(0,0,0,.65)
+    );
+
+  transition:
+    transform .3s ease;
 }
 
+.profile-card:hover .profile-badge{
+  transform:
+    scale(1.12);
+}
+
+/* MANAGE BUTTON */
+
 .manage-btn{
-  margin-top:48px;
-  background:none;
-  border:0;
-  color:#777;
-  font-size:clamp(15px,2vw,22px);
+  position:relative;
+
+  z-index:2;
+
+  margin-top:58px;
+
+  padding:
+    11px 24px;
+
+  border:
+    1px solid
+    rgba(255,255,255,.17);
+
+  border-radius:999px;
+
+  background:
+    rgba(255,255,255,.035);
+
+  color:#9f9993;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  font-size:12px;
+
+  font-weight:500;
+
+  letter-spacing:.22em;
+
+  backdrop-filter:
+    blur(10px);
+
+  -webkit-backdrop-filter:
+    blur(10px);
+
+  transition:
+    all .3s ease;
 }
 
 .manage-btn:hover{
   color:#fff;
+
+  background:
+    rgba(255,255,255,.08);
+
+  border-color:
+    rgba(255,255,255,.42);
+
+  transform:
+    translateY(-2px);
 }
 
 /* ================= MAIN APP ================= */
@@ -201,7 +539,9 @@ a{
   min-height:100vh;
   background:#111;
   opacity:0;
-  transition:opacity .55s ease;
+
+  transition:
+    opacity .55s ease;
 }
 
 #app.ready{
@@ -210,20 +550,30 @@ a{
 
 .topbar{
   height:68px;
+
   display:flex;
+
   align-items:center;
-  padding:0 4%;
+
+  padding:
+    0 4%;
+
   gap:35px;
+
   position:fixed;
+
   top:0;
   left:0;
   right:0;
+
   z-index:100;
-  background:linear-gradient(
-    180deg,
-    rgba(0,0,0,.94),
-    rgba(0,0,0,0)
-  );
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,.94),
+      rgba(0,0,0,0)
+    );
 }
 
 .top-logo{
@@ -240,12 +590,18 @@ a{
 
 .top-profile{
   margin-left:auto;
+
   width:34px;
   height:34px;
+
   border-radius:4px;
+
   background:#333;
+
   display:grid;
+
   place-items:center;
+
   font-weight:900;
 }
 
@@ -253,29 +609,40 @@ a{
 
 .hero{
   min-height:82vh;
+
   display:flex;
+
   align-items:flex-end;
+
   position:relative;
+
   overflow:hidden;
-  padding:0 5% 11vh;
+
+  padding:
+    0 5% 11vh;
+
   background:#111;
 }
 
 .hero-bg{
   position:absolute;
+
   inset:0;
+
   background:
     radial-gradient(
       circle at 72% 35%,
       rgba(229,9,20,.13),
       transparent 26%
     ),
+
     linear-gradient(
       90deg,
       #111,
       rgba(17,17,17,.72) 44%,
       rgba(17,17,17,.18) 78%
     ),
+
     linear-gradient(
       180deg,
       rgba(0,0,0,.12),
@@ -285,48 +652,99 @@ a{
 
 .hero-content{
   position:relative;
+
   z-index:2;
+
   max-width:650px;
 }
 
 .hero-kicker{
   font-size:13px;
+
   font-weight:800;
+
   letter-spacing:.18em;
+
   color:#d4d4d4;
 }
 
 .hero h2{
-  font-size:clamp(58px,8vw,108px);
-  margin:12px 0 0;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(58px,8vw,108px);
+
+  margin:
+    12px 0 0;
+
   line-height:.9;
-  letter-spacing:-.055em;
+
+  letter-spacing:-.045em;
+
+  font-weight:400;
+
+  text-shadow:
+    0 8px 35px
+    rgba(0,0,0,.5);
 }
 
 .hero h3{
-  font-size:clamp(28px,4vw,55px);
-  margin:20px 0 10px;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(28px,4vw,55px);
+
+  margin:
+    20px 0 10px;
+
+  font-weight:400;
+
+  font-style:italic;
+
+  letter-spacing:-.025em;
 }
 
 .hero p{
   font-size:18px;
-  line-height:1.5;
+
+  line-height:1.7;
+
   max-width:580px;
-  color:#ddd;
+
+  color:#d6d0cb;
 }
 
 .hero-actions{
   display:flex;
+
   gap:12px;
+
   margin-top:24px;
 }
 
 .play-btn,
 .info-btn{
   border:0;
-  border-radius:4px;
-  padding:13px 23px;
+
+  border-radius:999px;
+
+  padding:
+    13px 23px;
+
   font-weight:800;
+
+  letter-spacing:.01em;
+
+  transition:
+    transform .25s ease,
+    filter .25s ease,
+    background .25s ease;
 }
 
 .play-btn{
@@ -335,34 +753,64 @@ a{
 }
 
 .info-btn{
-  background:rgba(109,109,110,.72);
+  background:
+    rgba(109,109,110,.72);
+
   color:#fff;
+}
+
+.play-btn:hover,
+.info-btn:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.05);
 }
 
 /* ================= SECTIONS ================= */
 
 .content-section{
-  padding:46px 4% 10px;
+  padding:
+    46px 4% 10px;
 }
 
 .section-heading span{
-  font-size:12px;
-  letter-spacing:.18em;
+  font-size:11px;
+
+  letter-spacing:.24em;
+
   color:#aaa;
+
+  text-transform:uppercase;
 }
 
 .section-heading h2{
-  margin:8px 0 20px;
-  font-size:clamp(22px,3vw,34px);
+  margin:
+    8px 0 20px;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(22px,3vw,34px);
+
+  font-weight:400;
+
+  letter-spacing:-.025em;
 }
 
-/* ================= VIDEOS ================= */
+/* ================= CINEMATIC VIDEO CARDS ================= */
 
 .media-row{
   display:flex;
-  gap:14px;
+
+  gap:18px;
+
   overflow-x:auto;
-  padding:6px 2px 25px;
+
+  padding:
+    8px 2px 30px;
+
   scrollbar-width:none;
 }
 
@@ -372,50 +820,133 @@ a{
 
 .video-card{
   min-width:260px;
-  max-width:360px;
-  flex:0 0 28vw;
-  background:#1a1a1a;
-  border-radius:5px;
+
+  max-width:370px;
+
+  flex:
+    0 0 29vw;
+
+  background:#101010;
+
+  border:
+    1px solid
+    rgba(255,255,255,.09);
+
+  border-radius:10px;
+
   overflow:hidden;
-  transition:transform .2s;
+
+  box-shadow:
+    0 16px 40px
+    rgba(0,0,0,.38);
+
+  transition:
+    transform .3s ease,
+    box-shadow .3s ease,
+    border-color .3s ease;
 }
 
 .video-card:hover{
-  transform:scale(1.035);
+  transform:
+    translateY(-5px)
+    scale(1.02);
+
+  border-color:
+    rgba(255,255,255,.20);
+
+  box-shadow:
+    0 24px 55px
+    rgba(0,0,0,.56);
 }
 
 .video-card .thumb{
+  position:relative;
+
   aspect-ratio:16/9;
-  background:#222;
+
+  padding:5px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.22),
+      rgba(255,255,255,.04) 55%,
+      rgba(229,9,20,.14)
+    );
+
   overflow:hidden;
+}
+
+.video-card .thumb::after{
+  content:"";
+
+  position:absolute;
+
+  inset:5px;
+
+  border:
+    1px solid
+    rgba(255,255,255,.16);
+
+  border-radius:5px;
+
+  pointer-events:none;
+
+  z-index:2;
 }
 
 .video-card .thumb video{
   width:100%;
   height:100%;
+
   object-fit:cover;
+
   display:block;
+
+  border-radius:5px;
 }
 
 .video-title{
-  padding:11px 12px 13px;
-  font-size:14px;
-  font-weight:700;
+  padding:
+    14px 14px 7px;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:16px;
+
+  font-weight:400;
+
+  letter-spacing:.01em;
+
+  color:#eee;
 }
 
 .video-meta{
-  padding:0 12px 12px;
-  color:#aaa;
-  font-size:11px;
+  padding:
+    0 14px 14px;
+
+  color:#8e8e8e;
+
+  font-size:10px;
+
+  letter-spacing:.18em;
 }
 
-/* ================= PHOTOS ================= */
+/* ================= CINEMATIC PHOTO FRAMES ================= */
 
 .photo-row{
   display:flex;
-  gap:18px;
+
+  gap:20px;
+
   overflow-x:auto;
-  padding:6px 3px 28px;
+
+  padding:
+    8px 3px 32px;
+
   scrollbar-width:none;
 }
 
@@ -425,101 +956,272 @@ a{
 
 .photo-card{
   min-width:215px;
-  max-width:260px;
-  flex:0 0 21vw;
-  background:#181818;
-  border-radius:5px;
+
+  max-width:270px;
+
+  flex:
+    0 0 21vw;
+
+  background:#101010;
+
+  border:
+    1px solid
+    rgba(255,255,255,.10);
+
+  border-radius:10px;
+
   overflow:hidden;
-  transition:transform .2s;
+
+  box-shadow:
+    0 18px 45px
+    rgba(0,0,0,.44);
+
+  transition:
+    transform .35s ease,
+    box-shadow .35s ease,
+    border-color .35s ease;
 }
 
 .photo-card:hover{
-  transform:scale(1.035);
+  transform:
+    translateY(-7px)
+    scale(1.02);
+
+  border-color:
+    rgba(255,255,255,.20);
+
+  box-shadow:
+    0 26px 60px
+    rgba(0,0,0,.62);
 }
 
 .photo-frame{
+  position:relative;
+
   aspect-ratio:4/5;
-  background:#222;
+
+  padding:6px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.34),
+      rgba(255,255,255,.055) 48%,
+      rgba(229,9,20,.12)
+    );
+
   overflow:hidden;
+}
+
+.photo-frame::before{
+  content:"";
+
+  position:absolute;
+
+  inset:6px;
+
+  border:
+    1px solid
+    rgba(255,255,255,.17);
+
+  border-radius:5px;
+
+  pointer-events:none;
+
+  z-index:2;
+}
+
+.photo-frame::after{
+  content:"";
+
+  position:absolute;
+
+  left:12px;
+  right:12px;
+  bottom:12px;
+
+  height:35%;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(0,0,0,.30),
+      transparent
+    );
+
+  pointer-events:none;
+
+  z-index:2;
+
+  opacity:.5;
 }
 
 .photo-frame img{
   width:100%;
   height:100%;
+
   object-fit:cover;
+
   display:block;
+
+  border-radius:5px;
+
+  transition:
+    transform .5s ease,
+    filter .5s ease;
+}
+
+.photo-card:hover .photo-frame img{
+  transform:scale(1.045);
+
+  filter:
+    brightness(1.05)
+    contrast(1.03);
 }
 
 .photo-title{
-  padding:12px;
-  font-size:14px;
-  font-weight:700;
+  padding:
+    14px 13px 16px;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:15px;
+
+  font-weight:400;
+
+  letter-spacing:.02em;
+
+  color:#ddd;
 }
 
 /* ================= LETTER ================= */
 
 .letter-section{
-  padding:70px 4% 100px;
+  padding:
+    70px 4% 100px;
 }
 
 .letter-card{
   max-width:820px;
+
   margin:auto;
+
   padding:42px;
-  border-radius:8px;
-  background:linear-gradient(160deg,#241516,#171313);
-  border:1px solid rgba(255,255,255,.08);
-  box-shadow:0 30px 70px rgba(0,0,0,.35);
+
+  border-radius:14px;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(229,9,20,.10),
+      transparent 34%
+    ),
+    linear-gradient(
+      160deg,
+      #201819,
+      #121212
+    );
+
+  border:
+    1px solid
+    rgba(255,255,255,.08);
+
+  box-shadow:
+    0 30px 70px
+    rgba(0,0,0,.35);
 }
 
 .letter-kicker{
   font-size:11px;
-  letter-spacing:.2em;
+
+  letter-spacing:.24em;
+
   color:#aaa;
+
+  text-transform:uppercase;
 }
 
 .letter-card h2{
-  font-family:Georgia,serif;
-  font-size:clamp(32px,5vw,60px);
-  margin:12px 0 26px;
+  font-family:
+    Georgia,
+    serif;
+
+  font-size:
+    clamp(32px,5vw,60px);
+
+  margin:
+    12px 0 26px;
+
+  font-weight:400;
+
+  letter-spacing:-.035em;
 }
 
 .letter-card p{
-  font-family:Georgia,serif;
-  color:#ddd;
+  font-family:
+    Georgia,
+    serif;
+
+  color:#d8d1cb;
+
   font-size:19px;
-  line-height:1.65;
+
+  line-height:1.8;
 }
 
 .signature{
-  color:#f1b0b4!important;
+  color:
+    #efb2b7!important;
+
   text-align:right;
+
   font-style:italic;
 }
 
 /* ================= FOOTER ================= */
 
 footer{
-  padding:45px 4%;
-  border-top:1px solid rgba(255,255,255,.08);
+  padding:
+    45px 4%;
+
+  border-top:
+    1px solid
+    rgba(255,255,255,.08);
+
   display:flex;
+
   gap:15px;
+
   justify-content:space-between;
+
   flex-wrap:wrap;
+
   color:#888;
+
   font-size:12px;
-  letter-spacing:.12em;
+
+  letter-spacing:.16em;
 }
 
 /* ================= VIEWER ================= */
 
 .viewer{
   position:fixed;
+
   inset:0;
+
   z-index:6000;
-  background:rgba(0,0,0,.96);
+
+  background:
+    rgba(0,0,0,.96);
+
   display:grid;
+
   place-items:center;
+
   padding:30px;
 }
 
@@ -528,26 +1230,38 @@ footer{
 }
 
 .viewer-media{
-  max-width:min(92vw,1100px);
+  max-width:
+    min(92vw,1100px);
+
   max-height:88vh;
 }
 
 .viewer-media img,
 .viewer-media video{
   display:block;
+
   max-width:100%;
+
   max-height:88vh;
+
   margin:auto;
 }
 
 .viewer-close{
   position:absolute;
+
   top:18px;
+
   right:22px;
+
   background:none;
+
   border:0;
+
   color:#fff;
+
   font-size:42px;
+
   line-height:1;
 }
 
@@ -555,42 +1269,73 @@ footer{
 
 #musicPlayer{
   position:fixed;
+
   width:1px;
   height:1px;
+
   opacity:.001;
+
   pointer-events:none;
+
   left:-10px;
   bottom:-10px;
 }
 
 #musicButton{
   position:fixed;
+
   right:18px;
   bottom:18px;
+
   z-index:500;
-  border:1px solid rgba(255,255,255,.14);
-  background:rgba(20,20,20,.9);
+
+  border:
+    1px solid
+    rgba(255,255,255,.14);
+
+  background:
+    rgba(20,20,20,.9);
+
   color:#fff;
+
   border-radius:999px;
-  padding:11px 16px;
+
+  padding:
+    11px 16px;
 }
 
 /* ================= STATUS ================= */
 
 #status{
   position:fixed;
+
   left:50%;
+
   bottom:18px;
-  transform:translateX(-50%);
-  padding:8px 12px;
+
+  transform:
+    translateX(-50%);
+
+  padding:
+    8px 12px;
+
   border-radius:10px;
-  background:rgba(0,0,0,.78);
+
+  background:
+    rgba(0,0,0,.78);
+
   color:#bbb;
+
   font-size:11px;
+
   z-index:7000;
+
   opacity:0;
+
   pointer-events:none;
-  transition:opacity .2s;
+
+  transition:
+    opacity .2s;
 }
 
 #status.status-show{
@@ -602,7 +1347,9 @@ footer{
 @media(max-width:700px){
 
   .topbar{
-    padding:0 4%;
+    padding:
+      0 4%;
+
     gap:18px;
   }
 
@@ -612,7 +1359,9 @@ footer{
 
   .hero{
     min-height:72vh;
-    padding:0 5% 9vh;
+
+    padding:
+      0 5% 9vh;
   }
 
   .hero h2{
@@ -636,30 +1385,46 @@ footer{
   }
 
   .letter-card{
-    padding:28px 22px;
+    padding:
+      28px 22px;
   }
 
   #profileGrid{
-    gap:16px;
+    gap:
+      26px 16px;
   }
 
   .profile-card{
-    width:38vw;
-    max-width:170px;
+    width:39vw;
+    max-width:175px;
   }
 
   #profiles{
     padding-top:90px;
-    justify-content:flex-start;
+
+    justify-content:
+      flex-start;
   }
 
   #profiles h1{
+    font-size:40px;
+
     margin-top:30px;
+
+    margin-bottom:38px;
   }
 
   .nf-wordmark{
     left:6vw;
     top:5vw;
+  }
+
+  .profile-name{
+    font-size:20px;
+  }
+
+  .manage-btn{
+    margin-top:44px;
   }
 }
 </style>
@@ -698,11 +1463,15 @@ footer{
     NETFLIX
   </div>
 
-  <h1>Who's watching?</h1>
+  <h1>
+    Who's watching?
+  </h1>
 
   <div id="profileGrid"></div>
 
-  <button class="manage-btn" type="button">
+  <button
+    class="manage-btn"
+    type="button">
     MANAGE PROFILE
   </button>
 
@@ -710,7 +1479,9 @@ footer{
 
 <!-- ================= MAIN WEBSITE ================= -->
 
-<main id="app" class="hidden">
+<main
+  id="app"
+  class="hidden">
 
   <header class="topbar">
 
@@ -719,10 +1490,21 @@ footer{
     </div>
 
     <nav>
-      <a href="#home">Home</a>
-      <a href="#episodes">Episodes</a>
-      <a href="#memories">Memories</a>
-      <a href="#letter">Letter</a>
+      <a href="#home">
+        Home
+      </a>
+
+      <a href="#episodes">
+        Episodes
+      </a>
+
+      <a href="#memories">
+        Memories
+      </a>
+
+      <a href="#letter">
+        Letter
+      </a>
     </nav>
 
     <div class="top-profile">
@@ -731,9 +1513,11 @@ footer{
 
   </header>
 
-  <!-- HERO -->
+  <!-- ================= HERO ================= -->
 
-  <section id="home" class="hero">
+  <section
+    id="home"
+    class="hero">
 
     <div class="hero-bg"></div>
 
@@ -748,13 +1532,13 @@ footer{
       </h2>
 
       <h3>
-        A Story Worth Celebrating
+        A Story Made With Love
       </h3>
 
       <p>
         One special girl.
         Beautiful memories.
-        A little world made just to make you smile.
+        A little universe made just for your smile.
       </p>
 
       <div class="hero-actions">
@@ -778,18 +1562,20 @@ footer{
 
   </section>
 
-  <!-- VIDEOS -->
+  <!-- ================= VIDEOS ================= -->
 
-  <section id="episodes" class="content-section">
+  <section
+    id="episodes"
+    class="content-section">
 
     <div class="section-heading">
 
       <span>
-        CONTINUE WATCHING
+        THE STORY CONTINUES
       </span>
 
       <h2>
-        Minku Originals
+        Minku • Original Moments
       </h2>
 
     </div>
@@ -801,9 +1587,11 @@ footer{
 
   </section>
 
-  <!-- PHOTOS -->
+  <!-- ================= PHOTOS ================= -->
 
-  <section id="memories" class="content-section">
+  <section
+    id="memories"
+    class="content-section">
 
     <div class="section-heading">
 
@@ -812,7 +1600,7 @@ footer{
       </span>
 
       <h2>
-        A Story Made of Moments ❤️
+        Beautiful Moments • Beautiful You ❤️
       </h2>
 
     </div>
@@ -824,14 +1612,16 @@ footer{
 
   </section>
 
-  <!-- LETTER -->
+  <!-- ================= LETTER ================= -->
 
-  <section id="letter" class="letter-section">
+  <section
+    id="letter"
+    class="letter-section">
 
     <div class="letter-card">
 
       <div class="letter-kicker">
-        A LETTER FOR MINKU
+        A LITTLE LETTER FOR YOU
       </div>
 
       <h2>
@@ -851,7 +1641,7 @@ footer{
       </p>
 
       <p class="signature">
-        With love, Yuvi ❤️
+        With love, Always ❤️
       </p>
 
     </div>
@@ -861,7 +1651,7 @@ footer{
   <footer>
 
     <strong>
-      A YUVI PRODUCTION 🎬
+      A BIRTHDAY ORIGINAL 🎬
     </strong>
 
     <span>
@@ -943,10 +1733,10 @@ const PROFILE_FILE =
 
 
 /*
-  IMPORTANT:
-  Your new intro video is named Netflix MP4.
+  NEW INTRO:
+  Netflix_MP4.mp4
 
-  This searches for ANY video containing
+  We search for any video containing
   "netflix" in its filename.
 */
 
@@ -993,26 +1783,39 @@ const $ =
     document.querySelector(selector);
 
 
-function showStatus(message,error=false){
+function showStatus(
+  message,
+  error=false
+){
 
-  const element = $('#status');
+  const element =
+    $('#status');
 
   if(!element){
     return;
   }
 
-  element.textContent = message;
+  element.textContent =
+    message;
 
   element.style.color =
-    error ? '#ffb3b3' : '#bbb';
+    error
+      ? '#ffb3b3'
+      : '#bbb';
 
-  element.classList.add('status-show');
+  element.classList.add(
+    'status-show'
+  );
 
-  clearTimeout(showStatus.timer);
+  clearTimeout(
+    showStatus.timer
+  );
 
   showStatus.timer =
     setTimeout(()=>{
-      element.classList.remove('status-show');
+      element.classList.remove(
+        'status-show'
+      );
     },3500);
 }
 
@@ -1020,14 +1823,18 @@ function showStatus(message,error=false){
 function isImage(name){
 
   return /\.(jpe?g|png|webp|gif|avif)$/i
-    .test(String(name || ''));
+    .test(
+      String(name || '')
+    );
 }
 
 
 function isVideo(name){
 
   return /\.(mp4|mov|m4v|webm)$/i
-    .test(String(name || ''));
+    .test(
+      String(name || '')
+    );
 }
 
 
@@ -1040,12 +1847,15 @@ async function ensureSession(){
   const current =
     await supabase.auth.getSession();
 
-  if(current?.data?.session){
+  if(
+    current?.data?.session
+  ){
     return;
   }
 
   const {error} =
-    await supabase.auth.signInAnonymously();
+    await supabase.auth
+      .signInAnonymously();
 
   if(error){
 
@@ -1064,13 +1874,19 @@ async function ensureSession(){
 
 async function listFiles(){
 
-  const {data,error} =
+  const {
+    data,
+    error
+  } =
     await supabase.storage
       .from(BUCKET)
-      .list('',{
-        limit:100,
-        offset:0
-      });
+      .list(
+        '',
+        {
+          limit:100,
+          offset:0
+        }
+      );
 
   if(error){
 
@@ -1083,7 +1899,9 @@ async function listFiles(){
 
   return Array.isArray(data)
     ? data.filter(
-        item => item && item.name
+        item =>
+          item &&
+          item.name
       )
     : [];
 }
@@ -1093,9 +1911,14 @@ async function listFiles(){
    SIGNED URL
 ========================================================= */
 
-async function signedUrl(path){
+async function signedUrl(
+  path
+){
 
-  const {data,error} =
+  const {
+    data,
+    error
+  } =
     await supabase.storage
       .from(BUCKET)
       .createSignedUrl(
@@ -1112,7 +1935,9 @@ async function signedUrl(path){
 
   }
 
-  if(!data?.signedUrl){
+  if(
+    !data?.signedUrl
+  ){
 
     throw new Error(
       'Signed URL was not returned.'
@@ -1128,19 +1953,24 @@ async function signedUrl(path){
    EXACT FILE
 ========================================================= */
 
-function exactFile(name){
+function exactFile(
+  name
+){
 
   const target =
     String(name)
       .trim()
       .toLowerCase();
 
-  return state.files.find(
-    item =>
-      String(item.name)
-        .trim()
-        .toLowerCase() === target
-  ) || null;
+  return(
+    state.files.find(
+      item =>
+        String(item.name)
+          .trim()
+          .toLowerCase() ===
+        target
+    ) || null
+  );
 }
 
 
@@ -1152,7 +1982,8 @@ function findIntroFile(){
 
   /*
     FIRST PRIORITY:
-    Any video whose filename contains Netflix.
+    Any video containing
+    "netflix" in filename.
   */
 
   const netflixFile =
@@ -1165,6 +1996,7 @@ function findIntroFile(){
     );
 
   if(netflixFile){
+
     console.log(
       'Netflix intro found:',
       netflixFile.name
@@ -1176,14 +2008,15 @@ function findIntroFile(){
 
   /*
     SECOND PRIORITY:
-    Old WhatsApp video fallback.
+    Old WhatsApp fallback.
   */
 
   const whatsappFile =
     state.files.find(
       item =>
         isVideo(item.name) &&
-        /whatsapp.*video/i.test(item.name)
+        /whatsapp.*video/i
+          .test(item.name)
     );
 
   if(whatsappFile){
@@ -1215,9 +2048,8 @@ function findMusicFile(){
     state.files.find(
       item =>
         isVideo(item.name) &&
-        /music|song|audio|sound/i.test(
-          item.name
-        )
+        /music|song|audio|sound/i
+          .test(item.name)
     );
 
   if(named){
@@ -1226,17 +2058,22 @@ function findMusicFile(){
 
 
   /*
-    Use an MP4 which is NOT the Netflix intro.
+    Use an MP4 which is
+    NOT the Netflix intro.
   */
 
-  return state.files.find(
-    item =>
-      isVideo(item.name) &&
-      /\.mp4$/i.test(item.name) &&
-      !item.name
-        .toLowerCase()
-        .includes('netflix')
-  ) || null;
+  return(
+    state.files.find(
+      item =>
+        isVideo(item.name) &&
+        /\.mp4$/i.test(
+          item.name
+        ) &&
+        !item.name
+          .toLowerCase()
+          .includes('netflix')
+    ) || null
+  );
 }
 
 
@@ -1288,23 +2125,32 @@ async function playExactIntro(){
       file.name
     );
 
-    video.src = url;
 
-    video.muted = false;
+    video.src =
+      url;
 
-    video.volume = 1;
+    video.muted =
+      false;
 
-    video.controls = false;
+    video.volume =
+      1;
 
-    video.loop = false;
+    video.controls =
+      false;
 
-    video.playsInline = true;
+    video.loop =
+      false;
+
+    video.playsInline =
+      true;
 
 
     video.addEventListener(
       'ended',
       finishIntro,
-      {once:true}
+      {
+        once:true
+      }
     );
 
 
@@ -1318,24 +2164,29 @@ async function playExactIntro(){
         'Autoplay blocked. Waiting for tap.'
       );
 
-      tap.hidden = false;
+      tap.hidden =
+        false;
 
       tap.onclick =
         async ()=>{
 
-          tap.hidden = true;
+          tap.hidden =
+            true;
 
           try{
 
-            video.muted = false;
+            video.muted =
+              false;
 
-            video.volume = 1;
+            video.volume =
+              1;
 
             await video.play();
 
           }catch(_){
 
-            video.muted = true;
+            video.muted =
+              true;
 
             await video.play();
 
@@ -1350,15 +2201,20 @@ async function playExactIntro(){
       Safety timeout.
     */
 
-    setTimeout(()=>{
+    setTimeout(
+      ()=>{
 
-      if(!state.introFinished){
+        if(
+          !state.introFinished
+        ){
 
-        finishIntro();
+          finishIntro();
 
-      }
+        }
 
-    },20000);
+      },
+      20000
+    );
 
 
   }catch(error){
@@ -1385,11 +2241,14 @@ async function playExactIntro(){
 
 function finishIntro(){
 
-  if(state.introFinished){
+  if(
+    state.introFinished
+  ){
     return;
   }
 
-  state.introFinished = true;
+  state.introFinished =
+    true;
 
 
   const intro =
@@ -1411,7 +2270,9 @@ function finishIntro(){
       video.pause();
     }catch(_){}
 
-    video.removeAttribute('src');
+    video.removeAttribute(
+      'src'
+    );
 
     video.load();
 
@@ -1419,20 +2280,25 @@ function finishIntro(){
 
 
   if(tap){
-    tap.hidden = true;
+    tap.hidden =
+      true;
   }
 
 
   if(intro){
-    intro.style.display = 'none';
+    intro.style.display =
+      'none';
   }
 
 
   if(profiles){
 
-    profiles.style.display = 'flex';
+    profiles.style.display =
+      'flex';
 
-    profiles.classList.add('ready');
+    profiles.classList.add(
+      'ready'
+    );
 
   }
 
@@ -1452,7 +2318,8 @@ async function createProfiles(){
     return;
   }
 
-  grid.innerHTML = '';
+  grid.innerHTML =
+    '';
 
 
   const images =
@@ -1463,7 +2330,9 @@ async function createProfiles(){
 
 
   const main =
-    exactFile(PROFILE_FILE) ||
+    exactFile(
+      PROFILE_FILE
+    ) ||
     images[0] ||
     null;
 
@@ -1471,7 +2340,8 @@ async function createProfiles(){
   const others =
     images.filter(
       item =>
-        item.name !== main?.name
+        item.name !==
+        main?.name
     );
 
 
@@ -1484,34 +2354,45 @@ async function createProfiles(){
       active:true
     },
 
-   {
-  name:'Moments',
-  badge:'✨',
-  image:others[0] || main,
-  active:false
-},
-
     {
-      name:'Memories',
-      badge:'💕',
-      image:others[1] || main,
+      name:'Moments',
+      badge:'✨',
+      image:
+        others[0] ||
+        main,
       active:false
     },
 
     {
-      name:'Friends',
-      badge:'🥰',
-      image:others[2] || main,
+      name:'Memories',
+      badge:'💕',
+      image:
+        others[1] ||
+        main,
+      active:false
+    },
+
+    {
+      name:'Forever',
+      badge:'🫶',
+      image:
+        others[2] ||
+        main,
       active:false
     }
 
   ];
 
 
-  for(const profile of profileList){
+  for(
+    const profile
+    of profileList
+  ){
 
     const button =
-      document.createElement('button');
+      document.createElement(
+        'button'
+      );
 
     button.className =
       'profile-card' +
@@ -1521,17 +2402,22 @@ async function createProfiles(){
           : ''
       );
 
-    button.type = 'button';
+    button.type =
+      'button';
 
 
     const avatar =
-      document.createElement('div');
+      document.createElement(
+        'div'
+      );
 
     avatar.className =
       'profile-avatar';
 
 
-    if(profile.image){
+    if(
+      profile.image
+    ){
 
       try{
 
@@ -1540,14 +2426,21 @@ async function createProfiles(){
             profile.image.name
           );
 
+
         const image =
-          document.createElement('img');
+          document.createElement(
+            'img'
+          );
 
-        image.src = url;
+        image.src =
+          url;
 
-        image.alt = profile.name;
+        image.alt =
+          profile.name;
 
-        avatar.appendChild(image);
+        avatar.appendChild(
+          image
+        );
 
       }catch(_){
 
@@ -1565,7 +2458,9 @@ async function createProfiles(){
 
 
     const name =
-      document.createElement('div');
+      document.createElement(
+        'div'
+      );
 
     name.className =
       'profile-name';
@@ -1575,7 +2470,9 @@ async function createProfiles(){
 
 
     const badge =
-      document.createElement('div');
+      document.createElement(
+        'div'
+      );
 
     badge.className =
       'profile-badge';
@@ -1591,7 +2488,9 @@ async function createProfiles(){
     );
 
 
-    if(profile.active){
+    if(
+      profile.active
+    ){
 
       button.onclick =
         selectMinku;
@@ -1608,7 +2507,9 @@ async function createProfiles(){
     }
 
 
-    grid.appendChild(button);
+    grid.appendChild(
+      button
+    );
 
   }
 
@@ -1628,39 +2529,51 @@ async function loadPhotos(){
     return;
   }
 
-  row.innerHTML = '';
+  row.innerHTML =
+    '';
 
 
   const photos =
     state.files.filter(
       item =>
         isImage(item.name) &&
-        item.name !== PROFILE_FILE
+        item.name !==
+        PROFILE_FILE
     );
 
 
-  for(let i=0;i<photos.length;i++){
+  for(
+    let i=0;
+    i<photos.length;
+    i++
+  ){
 
     const object =
       photos[i];
 
 
     const card =
-      document.createElement('article');
+      document.createElement(
+        'article'
+      );
 
     card.className =
       'photo-card';
 
 
     const frame =
-      document.createElement('div');
+      document.createElement(
+        'div'
+      );
 
     frame.className =
       'photo-frame';
 
 
     const image =
-      document.createElement('img');
+      document.createElement(
+        'img'
+      );
 
     image.alt =
       'Minku memory ' +
@@ -1679,18 +2592,24 @@ async function loadPhotos(){
 
     }catch(error){
 
-      console.error(error);
+      console.error(
+        error
+      );
 
       continue;
 
     }
 
 
-    frame.appendChild(image);
+    frame.appendChild(
+      image
+    );
 
 
     const title =
-      document.createElement('div');
+      document.createElement(
+        'div'
+      );
 
     title.className =
       'photo-title';
@@ -1717,10 +2636,11 @@ async function loadPhotos(){
       };
 
 
-    row.appendChild(card);
+    row.appendChild(
+      card
+    );
 
   }
-
 }
 
 
@@ -1737,7 +2657,8 @@ async function loadVideos(){
     return;
   }
 
-  row.innerHTML = '';
+  row.innerHTML =
+    '';
 
 
   const music =
@@ -1748,41 +2669,55 @@ async function loadVideos(){
     state.files.filter(
       item =>
         isVideo(item.name) &&
-        item.name !== music?.name &&
+        item.name !==
+        music?.name &&
         !item.name
           .toLowerCase()
           .includes('netflix')
     );
 
 
-  for(let i=0;i<videos.length;i++){
+  for(
+    let i=0;
+    i<videos.length;
+    i++
+  ){
 
     const object =
       videos[i];
 
 
     const card =
-      document.createElement('article');
+      document.createElement(
+        'article'
+      );
 
     card.className =
       'video-card';
 
 
     const thumb =
-      document.createElement('div');
+      document.createElement(
+        'div'
+      );
 
     thumb.className =
       'thumb';
 
 
     const video =
-      document.createElement('video');
+      document.createElement(
+        'video'
+      );
 
-    video.muted = true;
+    video.muted =
+      true;
 
-    video.playsInline = true;
+    video.playsInline =
+      true;
 
-    video.preload = 'metadata';
+    video.preload =
+      'metadata';
 
 
     try{
@@ -1794,18 +2729,24 @@ async function loadVideos(){
 
     }catch(error){
 
-      console.error(error);
+      console.error(
+        error
+      );
 
       continue;
 
     }
 
 
-    thumb.appendChild(video);
+    thumb.appendChild(
+      video
+    );
 
 
     const title =
-      document.createElement('div');
+      document.createElement(
+        'div'
+      );
 
     title.className =
       'video-title';
@@ -1817,7 +2758,9 @@ async function loadVideos(){
 
 
     const meta =
-      document.createElement('div');
+      document.createElement(
+        'div'
+      );
 
     meta.className =
       'video-meta';
@@ -1843,10 +2786,11 @@ async function loadVideos(){
       };
 
 
-    row.appendChild(card);
+    row.appendChild(
+      card
+    );
 
   }
-
 }
 
 
@@ -1860,9 +2804,11 @@ async function prepareMusic(){
     findMusicFile();
 
   if(!file){
+
     console.warn(
       'Music file not found.'
     );
+
     return;
   }
 
@@ -1882,12 +2828,15 @@ async function prepareMusic(){
       return;
     }
 
+
     player.src =
       state.musicUrl;
 
-    player.loop = true;
+    player.loop =
+      true;
 
-    player.volume = .38;
+    player.volume =
+      .38;
 
   }catch(error){
 
@@ -1897,7 +2846,6 @@ async function prepareMusic(){
     );
 
   }
-
 }
 
 
@@ -1918,12 +2866,15 @@ async function playMusic(){
 
     await player.play();
 
+
     const button =
       $('#musicButton');
+
 
     button.classList.remove(
       'hidden'
     );
+
 
     button.textContent =
       '🔊 MUSIC ON';
@@ -1933,9 +2884,11 @@ async function playMusic(){
     const button =
       $('#musicButton');
 
+
     button.classList.remove(
       'hidden'
     );
+
 
     button.textContent =
       '▶ PLAY MUSIC';
@@ -1951,35 +2904,49 @@ async function playMusic(){
 
 function selectMinku(){
 
-  if(state.selected){
+  if(
+    state.selected
+  ){
     return;
   }
 
-  state.selected = true;
+  state.selected =
+    true;
 
 
   const profiles =
     $('#profiles');
 
+
   if(profiles){
-    profiles.style.display = 'none';
+
+    profiles.style.display =
+      'none';
+
   }
 
 
   const app =
     $('#app');
 
+
   if(!app){
     return;
   }
 
 
-  app.classList.remove('hidden');
+  app.classList.remove(
+    'hidden'
+  );
 
 
-  requestAnimationFrame(()=>{
-    app.classList.add('ready');
-  });
+  requestAnimationFrame(
+    ()=>{
+      app.classList.add(
+        'ready'
+      );
+    }
+  );
 
 
   playMusic();
@@ -2010,42 +2977,61 @@ function openViewer(
     $('#viewerMedia');
 
 
-  if(!viewer || !media){
+  if(
+    !viewer ||
+    !media
+  ){
     return;
   }
 
 
-  media.innerHTML = '';
+  media.innerHTML =
+    '';
 
 
-  if(type === 'image'){
+  if(
+    type === 'image'
+  ){
 
     const image =
-      document.createElement('img');
+      document.createElement(
+        'img'
+      );
 
-    image.src = src;
+    image.src =
+      src;
 
-    image.alt = title;
+    image.alt =
+      title;
 
-    media.appendChild(image);
+    media.appendChild(
+      image
+    );
 
   }else{
 
     const video =
-      document.createElement('video');
+      document.createElement(
+        'video'
+      );
 
-    video.src = src;
+    video.src =
+      src;
 
-    video.controls = true;
+    video.controls =
+      true;
 
-    video.autoplay = true;
+    video.autoplay =
+      true;
 
-    video.playsInline = true;
+    video.playsInline =
+      true;
 
 
     video.onplay =
       ()=>{
-        $('#musicPlayer')?.pause();
+        $('#musicPlayer')
+          ?.pause();
       };
 
 
@@ -2055,12 +3041,17 @@ function openViewer(
       };
 
 
-    media.appendChild(video);
+    media.appendChild(
+      video
+    );
 
   }
 
 
-  viewer.classList.remove('hidden');
+  viewer.classList.remove(
+    'hidden'
+  );
+
 
   viewer.setAttribute(
     'aria-hidden',
@@ -2075,11 +3066,13 @@ function closeViewer(){
   const viewer =
     $('#viewer');
 
+
   if(viewer){
 
     viewer.classList.add(
       'hidden'
     );
+
 
     viewer.setAttribute(
       'aria-hidden',
@@ -2092,6 +3085,7 @@ function closeViewer(){
   const video =
     $('#viewerMedia video');
 
+
   if(video){
     video.pause();
   }
@@ -2100,8 +3094,10 @@ function closeViewer(){
   const media =
     $('#viewerMedia');
 
+
   if(media){
-    media.innerHTML = '';
+    media.innerHTML =
+      '';
   }
 
 }
@@ -2123,8 +3119,13 @@ $('#viewer')
     'click',
     event => {
 
-      if(event.target.id === 'viewer'){
+      if(
+        event.target.id ===
+        'viewer'
+      ){
+
         closeViewer();
+
       }
 
     }
@@ -2135,8 +3136,13 @@ document.addEventListener(
   'keydown',
   event => {
 
-    if(event.key === 'Escape'){
+    if(
+      event.key ===
+      'Escape'
+    ){
+
       closeViewer();
+
     }
 
   }
@@ -2163,12 +3169,15 @@ $('#musicButton')
       const player =
         $('#musicPlayer');
 
+
       if(!player){
         return;
       }
 
 
-      if(player.paused){
+      if(
+        player.paused
+      ){
 
         await playMusic();
 
@@ -2212,7 +3221,8 @@ async function start(){
     console.info(
       '[Minku private files]',
       state.files.map(
-        file => file.name
+        file =>
+          file.name
       )
     );
 
@@ -2251,6 +3261,7 @@ async function start(){
       '[Minku startup]',
       error
     );
+
 
     showStatus(
       error.message,
